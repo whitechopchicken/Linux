@@ -32,13 +32,15 @@ int main(void)
     int i, n;           //i：计数变量，n 接收客户端发送的buf大小
     pid_t pid;          //记录进程id
 
-    struct sigaction newact;    //作用
-    newact.sa_handler = do_sigchild;
-    sigemptyset(&newact.sa_mask) ;      //作用：
-    newact.sa_flags = 0 ;
-    sigaction(SIGCHLD, &newact, NULL);      //作用：
-    
-    listenfd = Socket(AF_INET, SOCK_STREAM, 0);
+    struct sigaction newact;    //作用：用于设置SIGCHLD信号的处理方式。
+    newact.sa_handler = do_sigchild;   //作用： 
+    sigemptyset(&newact.sa_mask) ;      //作用： 将 newact.sa_mask 的信号屏蔽集初始化为空集。这意味着在处理 SIGCHLD 信号时，不会阻塞或屏蔽其他信号。
+    newact.sa_flags = 0 ;               //意义：默认标志来处理信号
+    sigaction(SIGCHLD, &newact, NULL);      //作用：将新的信号处理设置应用于 SIGCHLD 信号。这将使用 newact 中定义的处理方式来处理接收到的 SIGCHLD 信号。
+    //这段代码的作用是设置在接收到 SIGCHLD 信号时调用 do_sigchild 函数进行处理，并且不阻塞其他信号。通过这种方式，可以在子进程退出时自动回收其资源，避免僵尸进程的产生。
+
+
+    listenfd = Socket(AF_INET, SOCK_STREAM, 0); //SOCK_STREAM 表示创建 面向连接的套接字-->TCP协议 ； 0 表示使用默认的协议-->IPPROTP_TCP
 
     bzero(&serv_addr, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET ;
@@ -73,6 +75,4 @@ int main(void)
             return 0;
         }
     }
-
-
 }
