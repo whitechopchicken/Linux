@@ -1,0 +1,5 @@
+server:
+    1.直接运行，在另外的终端 nc ip地址 端口
+
+client:
+    
